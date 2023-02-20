@@ -1,46 +1,97 @@
 #Alejandro Guillén Merino       DNI: 48790456G
+
+#QuickSort
 set terminal png
-set output "qs-vs-hs.png"
+set output "quickSort.png"
 
-set xlabel "Array size"
-set ylabel "CPU time (ms)"
+set xlabel "size of arrays"
+set ylabel "Millions of program steps"
 
-set title  "Quick Sort: Empirical Analysis of Exact Time Complexity"
+set title  "QuickSort"
 
-plot "qs-vs-hs.MSteps" using 1:2 with points title "CPU Times of sample"
+plot "qs-vs-hs.MSteps" using 1:2 with linespoints title "random arrays" ,\
+ "qs-vs-hs.MSteps" using 1:4 with linespoints title "sorted arrays" ,\
+ "qs-vs-hs.MSteps" using 1:6 with linespoints title "reverse-sorted arrays"
 
+###############################################################################
 
-##########################################################################
-#Testing different analytical functions to determine which best fits:
+#HeapSort
+set terminal png
+set output "heapSort.png"
 
-set output "qs-vs-hs_and_Fit-Function.png"
-set title "Quick Sort: Exact time complexity and Fit function"
+set xlabel "size of arrays"
+set ylabel "Millions of program steps"
 
+set title  "HeapSort"
 
-#------------------------------------------------------------------------
+plot "qs-vs-hs.MSteps" using 1:3 with linespoints title "random arrays" ,\
+ "qs-vs-hs.MSteps" using 1:5 with linespoints title "sorted arrays" ,\
+ "qs-vs-hs.MSteps" using 1:7 with linespoints title "reverse-sorted arrays"
 
-# Testing 3 different functions:
-#Uncomment the function to be tested and comment the rest:
+###############################################################################
 
-##Fit to a linear function: 
-#y(x)=a*x + b 
-#fitFunction="Fitting qs-vs-hs time values to f(n) = n+k"
-#fit y(x) "qs-vs-hs.MSteps" using 1:2 via a,b
+#Versus random
+set terminal png
+set output "qs-vs-hs-RA.png"
 
+set xlabel "size of arrays"
+set ylabel "Millions of program steps"
 
-##Fit to a (n log n + k) function: 
-y(x)=a*x*log(x) + b*x + c
-fitFunction="Fitting qs-vs-hs time values to f(n) = n log(n)+n"
+set title  "Quicksort versus Heapsort (random arrays)"
+
+y(x) = a*x*log(x) + b*x + c
 fit y(x) "qs-vs-hs.MSteps" using 1:2 via a,b,c
 
+g(x) = d*x*log(x) +e*x + f
+fit g(x) "qs-vs-hs.MSteps" using 1:3 via d,e,f
 
-##Fit to a cuadratic function: 
-#y(x)=a*x*x + b*x + c
-#fitFunction="Fitting qs-vs-hs time values to f(n) = n²+n+k"
-#fit y(x) "qs-vs-hs.MSteps" using 1:2 via a,b,c
+plot "qs-vs-hs.MSteps" using 1:2 with points title "Quicksort" ,\
+ "qs-vs-hs.MSteps" using 1:3 with points title "Heapsort" ,\
+ y(x) title "fitting Quicksort time values to ..." ,\
+ g(x) title "fitting Heapsort time values to ..." 
 
-#------------------------------------------------------------------------
+##############################################################################
 
+#Versus sorted
 
-#Finally draw both functions (CPU times of sample and the one that best fits) on one graph
-plot "qs-vs-hs.MSteps" using 1:2 with points title "CPU times of sample", y(x) title fitFunction  
+set terminal png
+set output "qs-vs-hs-SA.png"
+
+set xlabel "size of arrays"
+set ylabel "Millions of program steps"
+
+set title  "Quicksort versus Heapsort (sorted arrays)"
+
+y(x) = a*x*log(x) + b*x + c
+fit y(x) "qs-vs-hs.MSteps" using 1:4 via a,b,c
+
+g(x) = d*x*log(x) +e*x + f
+fit g(x) "qs-vs-hs.MSteps" using 1:5 via d,e,f
+
+plot "qs-vs-hs.MSteps" using 1:4 with points title "Quicksort" ,\
+ "qs-vs-hs.MSteps" using 1:5 with points title "Heapsort" ,\
+ y(x) title "fitting Quicksort time values to ..." ,\
+ g(x) title "fitting Heapsort time values to ..." 
+
+###############################################################################
+
+#Versus reverse
+
+set terminal png
+set output "qs-vs-hs-RSA.png"
+
+set xlabel "size of arrays"
+set ylabel "Millions of program steps"
+
+set title  "Quicksort versus Heapsort (reverse-sorted arrays)"
+
+y(x) = a*x*log(x) + b*x + c
+fit y(x) "qs-vs-hs.MSteps" using 1:6 via a,b,c
+
+g(x) = d*x*log(x) +e*x + f
+fit g(x) "qs-vs-hs.MSteps" using 1:7 via d,e,f
+
+plot "qs-vs-hs.MSteps" using 1:6 with points title "Quicksort" ,\
+ "qs-vs-hs.MSteps" using 1:7 with points title "Heapsort" ,\
+ y(x) title "fitting Quicksort time values to ..." ,\
+ g(x) title "fitting Heapsort time values to ..." 

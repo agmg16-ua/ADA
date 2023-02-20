@@ -16,5 +16,4 @@ tar: qs-vs-hs.cc qs-vs-hs.gpi makefile
 	tar cvfz 48790456G.tar.gz qs-vs-hs.cc qs-vs-hs.gpi makefile
 
 clean: 
-	rm -f qs-vs-hs qs-vs-hs.MSteps fit.log qs-vs-hs*.png *~
- 
+	rm -f qs-vs-hs qs-vs-hs.MSteps fit.log qs-vs-hs*.png quickSort.png heapSort.png *~
