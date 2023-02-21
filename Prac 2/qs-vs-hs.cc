@@ -132,7 +132,7 @@ int main(void){
 
         cout << size << "\t\t" << std::flush;
 
-        //random quick
+        //RANDOM QUICKSORT
         for(int i=0; i<30; i++) {
             for (size_t j = 0; j < size; j++) {
                 vRan[j] = rand(); 
@@ -142,7 +142,7 @@ int main(void){
         
         cout << steps/30000000 << "  \t" << std::flush;
 
-        //random heap
+        //RANDOM HEAPSORT
         steps = 0;
         for(int i=0; i<30; i++) {
             for (size_t j = 0; j < size; j++) {
@@ -153,7 +153,7 @@ int main(void){
 
         cout << steps/30000000 << "  \t" << std::flush;
         
-        //sorted quick
+        //SORTED QUICKSORT
         for(size_t i=0; i<size; i++) {
             vSort[i] = i;
         }
@@ -165,7 +165,7 @@ int main(void){
 
         cout << steps/30000000 << "  \t " << std::flush;
 
-        //sorted heap
+        //SORTED HEAPSORT
         steps = 0;
         for(int i=0; i<30; i++) {
             heapSort(vSort, size);
@@ -177,7 +177,7 @@ int main(void){
             vRever[i] = (size-1) - i;
         }
 
-        //reverse quick
+        //REVERSE QUICKSORT
         steps = 0;
         for(int i=0; i<30; i++) {
             middle_QuickSort(vRever, 0, size-1);
@@ -185,7 +185,7 @@ int main(void){
 
         cout << steps/30000000 << "     \t" << std::flush;
 
-        //reverse heap
+        //REVERSE HEAPSORT
         steps = 0;
         for(int i=0; i<30; i++) {
             heapSort(vRever, size);
@@ -194,28 +194,28 @@ int main(void){
         cout << steps/30000000 << endl;
 
         
-		for (size_t i = 1; i < size; i++)
+		for (size_t i = 1; i < size; i++){
 			if (vRan[i] < vRan[i-1]){ 
 				cerr << "Panic, array not sorted! RAN " << i << " " << size << endl; 
 				exit(EXIT_FAILURE);            
 			}
-
+        }
         delete[] vRan; 
 
-		for (size_t i = 1; i < size; i++)
+		for (size_t i = 1; i < size; i++) {
 			if (vSort[i] < vSort[i-1]){ 
 				cerr << "Panic, array not sorted! SORT" << i << endl; 
 				exit(EXIT_FAILURE);            
 			}
-
+        }
         delete[] vSort; 
 
-		for (size_t i = 1; i < size; i++)
+		for (size_t i = 1; i < size; i++) {
 			if (vRever[i] < vRever[i-1]){ 
 				cerr << "Panic, array not sorted! REVER" << i << endl; 
 				exit(EXIT_FAILURE);            
 			}
-
+        }
         delete[] vRever;   
     }
 }
