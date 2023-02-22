@@ -9,9 +9,9 @@ set ylabel "Millions of program steps"
 
 set title  "QuickSort"
 
-plot "qs-vs-hs.MSteps" using 1:2 with linespoints title "random arrays" ,\
- "qs-vs-hs.MSteps" using 1:4 with linespoints title "sorted arrays" ,\
- "qs-vs-hs.MSteps" using 1:6 with linespoints title "reverse-sorted arrays"
+plot "qs-vs-hs.Msteps" using 1:2 with linespoints title "random arrays" ,\
+ "qs-vs-hs.Msteps" using 1:4 with linespoints title "sorted arrays" ,\
+ "qs-vs-hs.Msteps" using 1:6 with linespoints title "reverse-sorted arrays"
 
 ###############################################################################
 
@@ -24,9 +24,9 @@ set ylabel "Millions of program steps"
 
 set title  "HeapSort"
 
-plot "qs-vs-hs.MSteps" using 1:3 with linespoints title "random arrays" ,\
- "qs-vs-hs.MSteps" using 1:5 with linespoints title "sorted arrays" ,\
- "qs-vs-hs.MSteps" using 1:7 with linespoints title "reverse-sorted arrays"
+plot "qs-vs-hs.Msteps" using 1:3 with linespoints title "random arrays" ,\
+ "qs-vs-hs.Msteps" using 1:5 with linespoints title "sorted arrays" ,\
+ "qs-vs-hs.Msteps" using 1:7 with linespoints title "reverse-sorted arrays"
 
 ###############################################################################
 
@@ -40,13 +40,13 @@ set ylabel "Millions of program steps"
 set title  "Quicksort versus Heapsort (random arrays)"
 
 y(x) = a*x*log(x) + b*x + c
-fit y(x) "qs-vs-hs.MSteps" using 1:2 via a,b,c
+fit y(x) "qs-vs-hs.Msteps" using 1:2 via a,b,c
 
 g(x) = d*x*log(x) +e*x + f
-fit g(x) "qs-vs-hs.MSteps" using 1:3 via d,e,f
+fit g(x) "qs-vs-hs.Msteps" using 1:3 via d,e,f
 
-plot "qs-vs-hs.MSteps" using 1:2 with points title "Quicksort" ,\
- "qs-vs-hs.MSteps" using 1:3 with points title "Heapsort" ,\
+plot "qs-vs-hs.Msteps" using 1:2 with points title "Quicksort" ,\
+ "qs-vs-hs.Msteps" using 1:3 with points title "Heapsort" ,\
  y(x) title "fitting Quicksort time values to ..." ,\
  g(x) title "fitting Heapsort time values to ..." 
 
@@ -63,13 +63,13 @@ set ylabel "Millions of program steps"
 set title  "Quicksort versus Heapsort (sorted arrays)"
 
 y(x) = a*x*log(x) + b*x + c
-fit y(x) "qs-vs-hs.MSteps" using 1:4 via a,b,c
+fit y(x) "qs-vs-hs.Msteps" using 1:4 via a,b,c
 
 g(x) = d*x*log(x) +e*x + f
-fit g(x) "qs-vs-hs.MSteps" using 1:5 via d,e,f
+fit g(x) "qs-vs-hs.Msteps" using 1:5 via d,e,f
 
-plot "qs-vs-hs.MSteps" using 1:4 with points title "Quicksort" ,\
- "qs-vs-hs.MSteps" using 1:5 with points title "Heapsort" ,\
+plot "qs-vs-hs.Msteps" using 1:4 with points title "Quicksort" ,\
+ "qs-vs-hs.Msteps" using 1:5 with points title "Heapsort" ,\
  y(x) title "fitting Quicksort time values to ..." ,\
  g(x) title "fitting Heapsort time values to ..." 
 
@@ -86,12 +86,12 @@ set ylabel "Millions of program steps"
 set title  "Quicksort versus Heapsort (reverse-sorted arrays)"
 
 y(x) = a*x*log(x) + b*x + c
-fit y(x) "qs-vs-hs.MSteps" using 1:6 via a,b,c
+fit y(x) "qs-vs-hs.Msteps" using 1:6 via a,b,c
 
 g(x) = d*x*log(x) +e*x + f
-fit g(x) "qs-vs-hs.MSteps" using 1:7 via d,e,f
+fit g(x) "qs-vs-hs.Msteps" using 1:7 via d,e,f
 
-plot "qs-vs-hs.MSteps" using 1:6 with points title "Quicksort" ,\
- "qs-vs-hs.MSteps" using 1:7 with points title "Heapsort" ,\
+plot "qs-vs-hs.Msteps" using 1:6 with points title "Quicksort" ,\
+ "qs-vs-hs.Msteps" using 1:7 with points title "Heapsort" ,\
  y(x) title "fitting Quicksort time values to ..." ,\
  g(x) title "fitting Heapsort time values to ..." 
