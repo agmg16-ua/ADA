@@ -173,13 +173,12 @@ int main(void){
 
         cout << steps/30000000 << "  \t" << std::flush;
 
-        for(size_t i=0; i<size; i++) {
-            vRever[i] = (size-1) - i;
-        }
-
         //REVERSE QUICKSORT
         steps = 0;
         for(int i=0; i<30; i++) {
+            for(size_t j=0; j<size; j++) {
+                vRever[j] = (size-1) - j;
+            }
             middle_QuickSort(vRever, 0, size-1);
         }
 
@@ -188,6 +187,9 @@ int main(void){
         //REVERSE HEAPSORT
         steps = 0;
         for(int i=0; i<30; i++) {
+            for(size_t j=0; j<size; j++) {
+                vRever[j] = (size-1) - j;
+            }
             heapSort(vRever, size);
         }
 
