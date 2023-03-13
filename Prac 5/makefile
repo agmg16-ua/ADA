@@ -16,4 +16,4 @@ tar: pow2.cc pow2.gpi makefile
 	tar cvfz 48790456G.tar.gz pow2.cc pow2.gpi makefile
 
 clean: 
-	rm -f pow2 pow2.Msteps fit.log pow2*.png quickSort.png heapSort.png *~
+	rm -f pow2 pow2.Msteps fit.log pow2*.png *~
