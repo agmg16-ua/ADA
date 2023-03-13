@@ -1,0 +1,22 @@
+#Alejandro Guillén Merino       DNI: 48790456G
+
+#Versus reverse
+
+set terminal png
+set output "pow2.png"
+
+set xlabel "n"
+set ylabel "Program steps"
+
+set title  "Pow2"
+
+y(x) = a*x*log(x) + b*x + c
+fit y(x) "pow2.Msteps" using 1:6 via a,b,c
+
+g(x) = d*x*log(x) +e*x + f
+fit g(x) "pow2.Msteps" using 1:7 via d,e,f
+
+plot "qs-vs-hs.Msteps" using 1:6 with points title "Quicksort" ,\
+ "qs-vs-hs.Msteps" using 1:7 with points title "Heapsort" ,\
+ y(x) title "fitting Quicksort time values to ..." ,\
+ g(x) title "fitting Heapsort time values to ..." 
