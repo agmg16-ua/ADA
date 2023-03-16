@@ -5,6 +5,7 @@ using namespace std;
 
 long pasos = 0;
 
+//Coste: \Tetha(n)
 unsigned long pow2_1(unsigned n) {
     pasos++;
 
@@ -15,6 +16,7 @@ unsigned long pow2_1(unsigned n) {
     }
 }
 
+//Coste: \Tetha(log2(n))
 unsigned long pow2_2(unsigned n) {
     pasos++;
 
@@ -22,7 +24,7 @@ unsigned long pow2_2(unsigned n) {
         return 1;
     } else {
 
-        int aux = pow2_2(n/2);
+        unsigned long aux = pow2_2(n/2);
         
         if (n % 2 == 0) {
             return aux * aux;
@@ -33,6 +35,7 @@ unsigned long pow2_2(unsigned n) {
     
 }
 
+//Coste: \Tetha(2^n)
 unsigned long pow2_3(unsigned n) {
     pasos++;
 
@@ -45,10 +48,10 @@ unsigned long pow2_3(unsigned n) {
 
 int main() {
     unsigned long n;
-    //Con intencion de hacer la gráfica, se van a utilizar los exponentes 10, 25, 50 y 100
+    //Se ha probado en los ordenadores de la eps y con n=20 tarda menos de 5 segundos, aunque se puede alcanzar n=29 en menos de 5 segundos en mi portatil
     cout << "#n    pow2_1  pow2_2   pow2_3" << endl
         << "#--------------------------------------" << endl;
-    for(n = 1; n<=25; n++) {
+    for(n = 1; n<=20; n++) {
 
         cout << n << "    \t";
 

@@ -1,31 +1,39 @@
 #Alejandro Guillén Merino       DNI: 48790456G
 
+#Están definidas las funciones pero no dibujadas ya que no se si son necesarias
+#Para verlas, en el plot, eliminar los '#' de delante de las funciones y volver a hacer make para verlas
+
 set terminal png
 set output "pow2.png"
 
 set xlabel "n"
 set ylabel "Program steps"
 
-set yrange [0:100]
+set yrange [0:50]
 
-set title  "Pow2-1"
+set title  "Pow2"
 
-y(x) = a*x+b
-fit y(x) "pow2.Msteps" using 1:2 via a,b
+####################################################################
+
+y(x) =  a * x + 1
+fit y(x) "pow2.Steps" using 1:2 via a
 
 ####################################################################
 
 g(x) = a*log(x) + b
-fit g(x) "pow2.Msteps" using 1:3 via a,b
+fit g(x) "pow2.Steps" using 1:3 via a,b
 
-###################################################################
+####################################################################
 
 r(x) = a*2**x + b*2**(x-1) + c
-fit r(x) "pow2.Msteps" using 1:4 via a,b,c
+fit r(x) "pow2.Steps" using 1:4 via a,b,c
 
-plot y(x) title "f(x)=pow2-1",\
-   "pow2.Msteps" using 1:2 with points title "points pow2-1",\
-   g(x) title "f(x)=pow2-2",\
-   "pow2.Msteps" using 1:3 with points title "points pow2-2",\
-   r(x) title "f(x)=pow2-3",\
-   "pow2.Msteps" using 1:4 with points title "points pow2-3"
+####################################################################
+
+plot "pow2.Steps" using 1:2 with linespoints title "points pow2-1",\
+   "pow2.Steps" using 1:3 with linespoints title "points pow2-2",\
+   "pow2.Steps" using 1:4 with linespoints title "points pow2-3",\
+   #y(x) title "f(x)=pow2-1",\
+   #g(x) title "f(x)=pow2-2",\
+   #r(x) title "f(x)=pow2-3"
+
