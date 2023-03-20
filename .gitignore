@@ -3,3 +3,5 @@
 
 #Entregables comprimidos
 *.tar.gz
+*.tgz
+*.zip

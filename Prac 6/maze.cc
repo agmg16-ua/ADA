@@ -1,6 +1,8 @@
+//Alejandro Guillén Merino      DNI: 48790456G
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 
 using namespace std;
 
@@ -25,19 +27,52 @@ void maze_parser() {
 }
 
 //-------------------------Métodos personales-----------------------------
-bool existe_parametro(int argc, char* argv[], const char* parametro) {
+bool checkParams(int argc, char* argv[]) {
+    bool p = false, t = false, ignore_misive = false, f = false;
+    string filename = "";
+
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], parametro) == 0) { // si se encuentra el parámetro
-            if (strcmp(argv[i], "-f") == 0 && i + 1 < argc && argv[i + 1][0] != '-') {
-                // si es el parámetro -f, comprobar que el siguiente no empieza por '-'
-                return true;
-            } else if (strcmp(argv[i], "-f") != 0) {
-                // si no es el parámetro -f, devolver true directamente
-                return true;
+        if (strcmp(argv[i], "-p") == 0) {
+            p = true;
+        } else if (strcmp(argv[i], "-t") == 0) {
+            t = true;
+        } else if (strcmp(argv[i], "--ignore-misive") == 0) {
+            ignore_misive = true;
+        } else if (strcmp(argv[i], "-f") == 0) {
+            if(i < argc - 1) {
+                f = true;
+                filename = argv[i+1];
+                i++;
+            } else {
+                cerr << "ERROR: missing filename." << endl
+                << "Usage: " << endl
+                << "maze [-p] [-t] [--ignore-misive] -f file" << endl;
+                exit(EXIT_FAILURE);
             }
+           
+        } else {
+            cerr << "ERROR: unknown option " << argv[i] << '.' << endl
+            << "Usage: " << endl
+            << "maze [-p] [-t] [--ignore-misive] -f file" << endl;
+        exit(EXIT_FAILURE);
         }
     }
-    return false; // si no se encuentra el parámetro
+
+    if (!f || filename == "") {
+        cerr << "Usage: " << endl
+            << "maze [-p] [-t] [--ignore-misive] -f file" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    ifstream infile(filename);
+    if (!infile.good()) {
+        cerr << "ERROR: can't open file: " << filename << '.' << endl
+            << "Usage: " << endl
+            << "maze [-p] [-t] [--ignore-misive] -f file" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    return true;
 }
 
 
@@ -45,16 +80,8 @@ bool existe_parametro(int argc, char* argv[], const char* parametro) {
 
 int main(int argc, char* argv[]) {
 
-    if(!existe_parametro(argc, argv, "-f")) {
-        cerr << "ERROR: -f <file_name> needed" << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    int pos_file = 0;
-    for(int i=0; i<argc; i++) {
-        if(strcmp(argv[i], "-f") == 0) {
-            pos_file = i+1;
-        }
+    if(checkParams(argc, argv)) {
+        cout << "It works!" << endl;
     }
 
     return 0;
