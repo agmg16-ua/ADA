@@ -5,5 +5,8 @@ all: maze
 maze: maze.cc
 	g++ ${OPTS} -o maze maze.cc	 
 
+tar: maze.cc makefile
+	tar cvfz 48790456G.tar.gz pow2.cc makefile
+
 clean: 
 	rm -f maze
