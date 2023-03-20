@@ -9,7 +9,7 @@ set output "pow2.png"
 set xlabel "n"
 set ylabel "Program steps"
 
-set yrange [0:50]
+set yrange [0:100]
 
 set title  "Pow2"
 
