@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 #include <climits>
+#include <iomanip>
 
 using namespace std;
 
@@ -188,6 +189,7 @@ void maze_it_vector() {
 
 }
 
+//Se usa para imprimir los datos en pantalla, y tambien calculará el camino con '*' utilizando una funcion auxiliar
 void maze_parser(int argc, char* argv[], vector<vector<int>> file_matrix, int naive, vector<vector<int>> memo_table) {
     int memo = memo_table[0][0] + 1;
 
@@ -212,11 +214,11 @@ void maze_parser(int argc, char* argv[], vector<vector<int>> file_matrix, int na
         for(unsigned i = 0; i < file_matrix.size(); i++) {
             for(unsigned j = 0; j < file_matrix[0].size(); j++) {
                 if(memo_table[i][j] >= 0 && memo_table[i][j] < memo) {
-                    cout << memo - memo_table[i][j] << " ";
+                    cout << setw(5) << memo - memo_table[i][j];
                 } else if(memo_table[i][j] < 0) {
-                    cout << "X ";
+                    cout << setw(5) << "X";
                 } else {
-                    cout << "- ";
+                    cout << setw(5) << "-";
                 }
             
             }
