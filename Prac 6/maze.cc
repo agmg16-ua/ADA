@@ -241,11 +241,86 @@ vector<vector<int>> maze_it_matrix(vector<vector<int>> &matriz) {
     return auxiliar;
 }
 
-int maze_it_vector(vector<vector<int>> matriz, vector<int> anterior, int row) {
-    int n = matriz.size();
-    int m = matriz[0].size();
+int maze_it_vector(vector<vector<int>> matriz, vector<vector<int>> &it_matrix) {
+    int filas = matriz.size();
+    int columnas = matriz[0].size();
 
-    return 0;
+    int inf = INT_MAX-1;
+    int row = 0;
+
+    vector<int> fila_anterior(columnas, inf);
+    vector<int> fila_actual = matriz[row];
+
+    if(fila_actual[0] == 0) {
+        return 0;
+    }
+
+    for(int i=0; i<filas; i++) {
+        row++;
+        for(int j=0; j<columnas; j++) {
+
+            //Casos especiales de la primera fila. Solo se puede acceder desde la izquierda
+            if(i==0 && j > 0) {
+                if(fila_actual[j-1] == inf) {
+                    fila_actual[j] = inf;
+                } else if(fila_actual[j] == 0) {
+                    fila_actual[j] = inf;
+                } else {
+                    fila_actual[j] = fila_actual[j-1] + 1;
+                }
+            }
+
+            //Casos especiales de la primera columna. Solo se puede acceder desde arriba
+            if(j==0 && i > 0) {
+                if(fila_anterior[j] == inf) {
+                    fila_actual[j] = inf;
+                } else if(fila_actual[j] == 0) {
+                    fila_actual[j] = inf;
+                } else {
+                    fila_actual[j] = fila_anterior[j] + 1;
+                }
+            }
+
+            //Para el resto de casos intermedios
+            if(i > 0 && j > 0) {
+                if(fila_actual[j] == 0) {
+                    fila_actual[j] = inf;
+                } else {
+                    int valor = min(fila_actual[j-1], min(fila_anterior[j-1], fila_anterior[j]));
+
+                    if(valor == inf) {
+                        fila_actual[j] = inf;
+                    } else {
+                        fila_actual[j] = valor + 1;
+                    }
+
+                }
+            }
+        }
+
+        it_matrix[i] = fila_actual;
+
+        //Control. Si todas las posiciones de la fila actual son inf, no hay salida
+        bool continuar = false;
+
+        for(int k=0; k<columnas; k++) {
+            if(fila_actual[k] != inf) {
+                continuar = true;
+                break;
+            }
+        }
+
+        if(continuar == false) {
+            break;
+        }
+
+        if(row != filas) {
+            fila_anterior = fila_actual;
+            fila_actual = matriz[row];
+        }        
+    }
+
+    return fila_actual[columnas-1];
 }
 
 void maze_parser() {
@@ -255,7 +330,7 @@ void maze_parser() {
 //-------------------------------------------IMPRIMIR TODO-----------------------------------------------------------------------------
 
 //Se usa para imprimir los datos en pantalla, y tambien calculará el camino con '*' utilizando una funcion auxiliar
-void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naive, vector<vector<int>> memo_table, int memo, vector<vector<int>> it_matrix, int it_vector) {
+void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naive, vector<vector<int>> memo_table, int memo, vector<vector<int>> it_matrix, int it_vector, vector<vector<int>> it_vector_table) {
     memo = memo_table[0][0];
     int it1 = it_matrix[0][0]+1;
 
@@ -267,7 +342,25 @@ void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naiv
 
     cout << ' ';
 
-    cout << memo << " " << it1 << " " << it_vector << endl;
+    if(memo == INT_MAX-1) {
+        cout << 0 << " ";
+    } else {
+        cout << memo << " ";
+    }
+
+    int max = it_matrix.size() * it_matrix[0].size();
+
+    if(it1 >= max) {
+        cout << 0 << " ";
+    } else {
+        cout << it1 << " ";
+    }
+
+    if(it_vector == INT_MAX-1) {
+        cout << 0 << endl;
+    } else {
+        cout << it_vector << endl;
+    }
 
     if(param_position(argc, argv, "-p") != -1) {
         maze_parser();
@@ -292,14 +385,14 @@ void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naiv
         cout << "Iterative table:" << endl;
         for(unsigned i = 0; i < file_matrix.size(); i++) {
             for(unsigned j = 0; j < file_matrix[0].size(); j++) {
-                if(it_matrix[i][j] >= 0 && it_matrix[i][j] < memo) {
-                    cout << setw(5) << memo - it_matrix[i][j];
-                } else if(it_matrix[i][j] < 0) {
+                if(it_vector_table[i][j] > it_vector) {
                     cout << setw(5) << "X";
-                } else {
+                } else if(it_vector_table[i][j] == INT_MAX-1) {
                     cout << setw(5) << "-";
+                } else {
+                    cout << setw(5
+                    ) << it_vector_table[i][j];
                 }
-            
             }
             cout << endl;
         }
@@ -353,13 +446,13 @@ int main(int argc, char* argv[]) {
     it_matrix = maze_it_matrix(it_matrix);
 
     //maze_it_vector----------------------------------------------------------------------------
-    vector<int> anterior = vector<int>(file_matrix[0]);
+    vector<vector<int>> it_table(file_matrix.size(), vector<int>(file_matrix[0].size()));
 
-    int it_vector = maze_it_vector(file_matrix, anterior, 0);
+    int it_vector = maze_it_vector(file_matrix, it_table);
     
     //print-------------------------------------------------------------------------------------
 
-    print_all(argc, argv, file_matrix, naive, memo_table, memo, it_matrix, it_vector);
+    print_all(argc, argv, file_matrix, naive, memo_table, memo, it_matrix, it_vector, it_table);
 
     return 0;
 }
