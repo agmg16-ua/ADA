@@ -91,22 +91,6 @@ vector<vector<int>> get_data_file(string fileName) {
     return file_matrix;
 }
 
-//En desarrollo: Se utilizará para imprimir el camino marcado con '*'
-void print_path(vector<vector<int>> matriz, vector<vector<int>> memo, int contador) {
-
-    for(int i=matriz.size()-1; i>=0; i--) {
-        for(int j=matriz[0].size()-1; j>=0; j--) {
-            if(memo[i][j] == contador) {
-                cout << '*';
-                contador--;
-            } else {
-                cout << matriz[i][j];
-            }
-        }
-        cout << endl;
-    }
-}
-
 //------------------------------------------------------------------------
 
 int maze_naive(vector<vector<int>>& matriz, unsigned row, unsigned col) {
@@ -323,8 +307,60 @@ int maze_it_vector(vector<vector<int>> matriz, vector<vector<int>> &it_matrix) {
     return fila_actual[columnas-1];
 }
 
-void maze_parser() {
-    cout << "?" <<  endl;
+void maze_parser(vector<vector<int>> matriz, vector<vector<int>> matriz_it) {
+    int m = matriz.size()-1;
+    int n = matriz[0].size()-1;
+
+    if(!(matriz_it[m-1][n-1] > 0 && matriz_it[m-1][n-1] < (n*m))){
+        return;
+    }
+    
+    //Comprobar que m y n no sea menor que el tamaño
+    while(matriz_it[m][n] != 1){
+
+        if(m==0) {
+            if(matriz_it[m][n-1] == matriz_it[m][n] - 1){
+                matriz_it[m][n] = -1;
+                n--;
+            } else {
+                break;
+            }
+        } else if(n==0) { 
+            if(matriz_it[m-1][n] == matriz_it[m][n] - 1) {
+                matriz_it[m][n] = -1;
+                m--;
+            } else {
+                break;
+            }
+        }else if(matriz_it[m-1][n-1] == matriz_it[m][n] -1) {
+            matriz_it[m][n] = -1;
+            n--;
+            m--;
+        } else if(matriz_it[m-1][n] == matriz_it[m][n] -1) {
+            matriz_it[m][n] = -1;
+            m--;
+        } else if(matriz_it[m][n-1] == matriz_it[m][n] -1) {
+            matriz_it[m][n] = -1;
+            n--;
+        } else {
+            cout << "NO HAY SALIDA" << endl;
+            break;
+        }
+    }
+
+    for(unsigned i=0; i<matriz.size(); i++) {
+        for(unsigned j=0; j<matriz[0].size(); j++) {
+            if(matriz_it[i][j] == -1) {
+                cout << "*";
+            } else if(i == 0 && j == 0) {
+                cout << "*";
+            }else {
+                cout << matriz[i][j];
+            }
+        }
+
+        cout << endl;
+    }
 }
 
 //-------------------------------------------IMPRIMIR TODO-----------------------------------------------------------------------------
@@ -334,14 +370,18 @@ void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naiv
     memo = memo_table[0][0];
     int it1 = it_matrix[0][0]+1;
 
+    //Control de naive
     if(naive == -1) {
-        cout << '-';
+        cout << "- ";
     } else {
-        cout << naive;
+        if(naive < 0) {
+            cout << 0 << " ";
+        } else {
+            cout << naive << " ";
+        }
     }
 
-    cout << ' ';
-
+    //Control de memo
     if(memo == INT_MAX-1) {
         cout << 0 << " ";
     } else {
@@ -350,22 +390,30 @@ void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naiv
 
     int max = it_matrix.size() * it_matrix[0].size();
 
+    //Control de it_matrix
     if(it1 >= max) {
         cout << 0 << " ";
     } else {
         cout << it1 << " ";
     }
 
+    //Control de it_vector
     if(it_vector == INT_MAX-1) {
         cout << 0 << endl;
     } else {
         cout << it_vector << endl;
     }
 
+    //Control para mostrar el camino (maze_parser)
     if(param_position(argc, argv, "-p") != -1) {
-        maze_parser();
+        if(it_vector == INT_MAX -1) {
+            cout << "NO EXIT" << endl;
+        } else {
+            maze_parser(file_matrix, it_vector_table);
+        }
     }
 
+    //Control para mostrar las tablas
     if(param_position(argc, argv, "-t") != -1) {
         cout << "Memoization table:" << endl;
         for(unsigned i = 0; i < file_matrix.size(); i++) {
@@ -385,13 +433,10 @@ void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naiv
         cout << "Iterative table:" << endl;
         for(unsigned i = 0; i < file_matrix.size(); i++) {
             for(unsigned j = 0; j < file_matrix[0].size(); j++) {
-                if(it_vector_table[i][j] > it_vector) {
+                if(it_vector_table[i][j] > it_vector || it_vector_table[i][j] == INT_MAX-1 || it_vector_table[i][j] == 0) {
                     cout << setw(5) << "X";
-                } else if(it_vector_table[i][j] == INT_MAX-1) {
-                    cout << setw(5) << "-";
                 } else {
-                    cout << setw(5
-                    ) << it_vector_table[i][j];
+                    cout << setw(5) << it_vector_table[i][j];
                 }
             }
             cout << endl;
@@ -401,7 +446,6 @@ void print_all(int argc, char* argv[], vector<vector<int>> file_matrix, int naiv
 }
 
 //-----------------------------------------------------------------------------------------------------
-
 
 
 int main(int argc, char* argv[]) { 
