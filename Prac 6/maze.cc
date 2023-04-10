@@ -9,8 +9,6 @@
 
 using namespace std;
 
-//El método recursivo memo_table obtiene correctamente valor del camino más corto. Sin embargo, no he logrado que se genere la tabla de memoizacion correctamente
-
 //-------------------------Métodos personales-----------------------------
 //Comprueba que los parametros introducidos sean correctos
 // -f file -> archivo con maze
