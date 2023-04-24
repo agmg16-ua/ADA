@@ -3,7 +3,7 @@ OPTS = -Wall -Wextra -O3 -std=c++0x
 
 all: maze_bt
 
-maze: maze_greedy.cc
+maze: maze_bt.cc
 	g++ ${OPTS} -o maze_bt maze_bt.cc	 
 
 tar: maze_bt.cc makefile
