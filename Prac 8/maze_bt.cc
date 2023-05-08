@@ -83,7 +83,9 @@ vector<vector<int>> get_data_file(string fileName) {
 
 //------------------------------------------------------------------------------
 
+void maze_bt() {
 
+}
 
 void print_result() {
 
