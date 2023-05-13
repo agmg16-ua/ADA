@@ -199,7 +199,7 @@ void print_result(vector<vector<int>> matrix, double time, int argc, char* argv[
     if(minDist > matrix.size() * matrix[0].size()) {
         cout << 0 << endl;
     } else {
-        cout << minDist+1 << endl;
+        cout << minDist << endl;
     }
     cout << visita << ' ' << explorado << ' ' << hoja << ' ' << no_factible << ' ' << no_prometedor << endl;
     cout << time << endl;
@@ -246,7 +246,7 @@ int main(int argc, char* argv[]) {
 
     visitado[0][0] = 1;
 
-    maze_bt(matrix, 0, 0, 0, visitado, almacen);
+    maze_bt(matrix, 0, 0, 1, visitado, almacen);
     auto end = clock();
 
     double time = 1.0 * (end-start)/CLOCKS_PER_SEC;
