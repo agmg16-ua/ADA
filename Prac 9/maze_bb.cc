@@ -7,11 +7,11 @@
 #include <climits>
 #include <ctime>
 #include <cmath>
+#include <queue>
 
 using namespace std;
 
-int minDist = INT_MAX-1;
-vector<int> moves, minMoves;
+vector<int> minMoves;
 
 struct Estadisticas {
     int visita = 0;
@@ -29,7 +29,8 @@ struct Nodo {
     int col;
     int opt;
     int pes;
-    bool visitado = false;
+    int dist;
+    vector<int> moves;
 };
 
 //----------------------------------Metodos Personales----------------------------------------
@@ -173,27 +174,176 @@ int cotaOptimista(int row, int col, int m, int n) {
 
 }
 
-int cotaPesimista() {
+int cotaPesimista(vector<vector<int>> maze, int row, int col) {
+    int dist = 0;
+    bool continuar = true;
+
+    while(continuar) {
+        if(row == maze.size()-1 && col == maze[0].size()-1) {
+            dist++;
+            continuar = false;
+        }
+        else if(row == maze.size()-1) {
+            dist++;
+            col++;
+        }
+        else if(col == maze[0].size()-1) {
+            dist++;
+            row++;
+        }
+        else {
+            if(maze[row+1][col+1] == 1) {
+                dist++;
+                row++;
+                col++;
+            }
+            else if(maze[row][col+1] == 1) {
+                dist++;
+                col++;
+            }
+            else if(maze[row+1][col] == 1){
+                dist++;
+                row++;
+            }
+            else {
+                dist = INT_MAX -1;
+                continuar = false;
+            }
+        }
+    }
+    return dist;
 
 }
 
-
-
-void maze_bb() {
-
+Nodo obtenerNodo(vector<vector<int>> maze, int row, int col, int dist, vector<int> moves) {
+    Nodo nodo;
+    nodo.row = row;
+    nodo.col = col;
+    nodo.opt = cotaOptimista(row, col, maze.size()-1, maze[0].size()-1);
+    nodo.pes = cotaPesimista(maze, row, col);
+    nodo.dist = dist;
+    nodo.moves = moves;
+    return nodo;
 }
 
-void print_result(vector<vector<int>> matrix, double time, int argc, char* argv[]) {
-    if(minDist > matrix.size() * matrix[0].size()) {
+bool esHoja(Nodo nodo, vector<vector<int>> maze) {
+    if(nodo.row == maze.size()-1 && nodo.col == maze[0].size()-1) {
+        return true;
+    }
+    return false;
+}
+
+bool esMejor(Nodo nodo, int mejorActual) {
+    if(nodo.dist < mejorActual) {
+        return true;
+    }
+
+    return false;
+}
+
+vector<Nodo> expande(Nodo nodo, vector<vector<int>> maze) {
+    vector<Nodo> nodos;
+    int dRow[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+    int dCol[] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+    for(int i=0; i<8; i++) {
+        if(!(nodo.row + dRow[i] < 0 || nodo.row + dRow[i] >= maze.size() || nodo.col + dCol[i] < 0 || nodo.col + dCol[i] >= maze[0].size())) {
+            vector<int> newMoves = nodo.moves;
+            newMoves.push_back(i+1);
+            Nodo ex = obtenerNodo(maze, nodo.row + dRow[i], nodo.col + dCol[i], nodo.dist + 1, newMoves);
+            nodos.push_back(ex);
+        }
+
+    }
+
+    return nodos;
+}
+
+bool dentroMaze(Nodo nodo, vector<vector<int>> maze) {
+    if(nodo.row >= 0 && nodo.row <= maze.size()-1 && nodo.col >= 0 && nodo.col <= maze[0].size()) {
+        return true;
+    }
+    return false;
+}
+
+bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<bool>> visitado) {
+    if(maze[nodo.row][nodo.col] == 0) {
+        return false;
+    }
+
+    if(visitado[nodo.row][nodo.col] == true) {
+        return false;
+    }
+
+    if(!dentroMaze(nodo, maze)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool esPrometedor(Nodo nodo, int mejorActual) {
+    if(nodo.opt > mejorActual) {
+        return false;
+    }
+
+    if(nodo.pes < nodo.opt) {
+        return false;
+    }
+
+
+    return true;
+}
+
+struct esPeor {
+    bool operator()(const Nodo &n1, const Nodo &n2) {
+        return n1.opt > n2.opt;
+    }
+};
+
+int maze_bb(vector<vector<int>> maze, vector<vector<bool>> &visitado) {
+    priority_queue<Nodo, vector<Nodo>, esPeor> pq;
+    Nodo inicial = obtenerNodo(maze, 0, 0, 1, {});
+    int mejorActual = inicial.pes;
+    pq.push(inicial);
+
+    while(!pq.empty()) {
+        Nodo actual = pq.top();
+        pq.pop();
+
+        if(esHoja(actual, maze)) {
+            estadisticas.hoja++;
+
+            if(esMejor(actual, mejorActual)) {
+                mejorActual = actual.dist;
+                minMoves = actual.moves;
+            }
+            continue;
+        }
+
+        visitado[actual.row][actual.col] = true;
+
+        for(Nodo nodo : expande(actual, maze)) {
+            if(esFactible(nodo, maze, visitado) && esPrometedor(nodo, mejorActual)) {
+                pq.push(nodo);
+            }
+        }
+    }
+
+    return mejorActual;
+}
+
+void print_result(vector<vector<int>> matrix, double time, int argc, char* argv[], int mejor) {
+    if(mejor > matrix.size() * matrix[0].size()) {
         cout << 0 << endl;
     } else {
-        cout << minDist << endl;
+        cout << mejor << endl;
     }
     cout << estadisticas.visita << ' ' << estadisticas.explorado << ' ' << estadisticas.hoja << ' ' << estadisticas.no_factible << ' ' << estadisticas.no_prometedor << ' ' << estadisticas.prometedor_rechazado << ' ' << estadisticas.mejor_solucion_act_hoja << ' ' << estadisticas.mejor_solucion_act_pesimista << endl;
     cout << time << endl;
 
     if(param_position(argc, argv, "--p2D") != -1) {
-        if((minDist <= 0 && matrix[0][0] == 0)|| minDist > matrix.size() * matrix[0].size()) {
+        if((mejor <= 0 && matrix[0][0] == 0)|| mejor > matrix.size() * matrix[0].size()) {
             cout << "NO EXIT" << endl;
         } else {
             print_matrix(matrix);
@@ -202,7 +352,7 @@ void print_result(vector<vector<int>> matrix, double time, int argc, char* argv[
 
     if(param_position(argc, argv, "-p") != -1) {
         cout << '<';
-        if((minDist <= 0 && matrix[0][0] == 0) || minDist > matrix.size() * matrix[0].size()) {
+        if((mejor <= 0 && matrix[0][0] == 0) || mejor > matrix.size() * matrix[0].size()) {
             cout << "NO EXIT";
         } else {
             for(int i=0; i<minMoves.size(); i++) {
@@ -222,13 +372,15 @@ int main(int argc, char* argv[]) {
 
     vector<vector<int>> matrix = get_data_file(argv[file_position]);
 
-    maze_bb();
+    vector<vector<bool>> visitado(matrix.size(), vector<bool>(matrix[0].size()));
+    
+    int mejor = maze_bb(matrix, visitado);
 
     auto end = clock();
 
     double time = 1000.0 * (end-start)/CLOCKS_PER_SEC;
 
-    print_result(matrix, time, argc, argv);
+    print_result(matrix, time, argc, argv, mejor);
 
     return 0;
 
