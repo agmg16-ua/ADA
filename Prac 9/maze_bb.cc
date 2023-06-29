@@ -6,6 +6,7 @@
 #include <vector>
 #include <climits>
 #include <ctime>
+#include <cmath>
 
 using namespace std;
 
@@ -13,21 +14,22 @@ int minDist = INT_MAX-1;
 vector<int> moves, minMoves;
 
 struct Estadisticas {
-    int visita;
-    int explorado;
-    int hoja;
-    int no_factible;
-    int no_prometedor;
-    int prometedor_rechazado;
-    int mejor_solucion_act_hoja;
-    int mejor_solucion_act_pesimista;
+    int visita = 0;
+    int explorado = 0;
+    int hoja = 0;
+    int no_factible = 0;
+    int no_prometedor = 0;
+    int prometedor_rechazado = 0;
+    int mejor_solucion_act_hoja = 0;
+    int mejor_solucion_act_pesimista = 0;
 } estadisticas;
 
-struct Posicion {
-    int minDist;
-    int optDist;
-    bool factible;
-    int visitado;
+struct Nodo {
+    int row;
+    int col;
+    int opt;
+    int pes;
+    bool visitado = false;
 };
 
 //----------------------------------Metodos Personales----------------------------------------
@@ -165,104 +167,19 @@ void print_matrix(vector<vector<int>> matrix) {
 
 //------------------------------------------------------------------------------
 
-int distOp(vector<vector<int>> maze, int row, int col) {
-    int distanciaOp = 0;
-    
-    while(true) {
-        if(row == maze.size()-1 && col == maze[0].size()-1) {
-            distanciaOp++;
-            break;
-        }
+int cotaOptimista(int row, int col, int m, int n) {
 
+    return sqrt( pow(m - row, 2) + pow(n - col, 2));
 
-        if(row < maze.size()-1 && col < maze[0].size()-1) {
-            row++;
-            col++;
-            distanciaOp++;
-        } else {
-            if(row == maze.size()-1) {
-                col++;
-                distanciaOp++;
-            } else if(col == maze[0].size()-1) {
-                row++;
-                distanciaOp++;
-            } else {
-                break;
-            }
-        }
-    }
-
-    return distanciaOp;
 }
 
-void maze_bb(vector<vector<int>> matrix, int x, int y, int distancia, vector<vector<Posicion>> &datosPosiciones) {
-    estadisticas.visita++; //CONTADOR
-    int n = matrix.size();
-    int m = matrix[0].size();
+int cotaPesimista() {
+
+}
 
 
-    if(datosPosiciones[x][y].minDist <= distancia) {
-        estadisticas.prometedor_rechazado++; //Contador
-        return;
-    } else {
-        datosPosiciones[x][y].minDist = distancia;
-    }
 
-    if(datosPosiciones[x][y].optDist == -1) {
-        datosPosiciones[x][y].optDist = distOp(matrix, x, y);
-    }
-
-    if(matrix[0][0] == 0 || matrix[n-1][m-1] == 0) {
-        return;
-    }
-    if(x == n-1 && y == m-1) {
-        estadisticas.hoja++; //CONTADOR
-        if(distancia < minDist) {
-            minDist = distancia;
-            minMoves = moves;
-        }
-        if(datosPosiciones[0][0].optDist == datosPosiciones[n-1][m-1].minDist) {
-            return;
-        }
-        return;
-    }
-
-    if(datosPosiciones[0][0].optDist == datosPosiciones[n-1][m-1].minDist) {
-        estadisticas.mejor_solucion_act_hoja++; //CONTADOR
-        return;
-    }
-
-    if(datosPosiciones[x][y].optDist + distancia > minDist){
-        estadisticas.no_factible++;
-        return;
-    }
-
-    if(distancia >= minDist) {
-        estadisticas.no_prometedor++; //CONTADOR
-        return;
-    }
-
-    int dx[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-    int dy[] = {0, 1, 1, 1, 0, -1, -1, -1};
-    int orden[] = {3, 2, 4, 0, 1, 5, 6, 7};
-    for (int j = 0; j < 8; j++) {  // probamos las 8 direcciones
-        int i = orden[j];
-        int nx = x + dx[i];
-        int ny = y + dy[i];
-        if(datosPosiciones[0][0].optDist == datosPosiciones[n-1][m-1].minDist) {
-            break;
-        }
-        if (nx >= 0 && nx < n && ny >= 0 && ny < m && matrix[nx][ny] == 1 && !datosPosiciones[nx][ny].visitado) {
-            estadisticas.explorado++; //CONTADOR
-            datosPosiciones[nx][ny].visitado = 1;
-            moves.push_back(i+1);
-            maze_bb(matrix, nx, ny, distancia+1, datosPosiciones);
-            datosPosiciones[nx][ny].visitado = 0;
-            moves.pop_back();
-        } else {
-            estadisticas.no_factible++; //CONTADOR
-        }
-    }
+void maze_bb() {
 
 }
 
@@ -305,30 +222,8 @@ int main(int argc, char* argv[]) {
 
     vector<vector<int>> matrix = get_data_file(argv[file_position]);
 
-    estadisticas.visita = 0;
-    estadisticas.explorado = 0;
-    estadisticas.hoja = 0;
-    estadisticas.mejor_solucion_act_hoja = 0;
-    estadisticas.mejor_solucion_act_pesimista = 0;
-    estadisticas.no_factible = 0;
-    estadisticas.no_prometedor = 0;
-    estadisticas.prometedor_rechazado = 0;
+    maze_bb();
 
-    vector<vector<Posicion>> datosPosiciones(matrix.size(), vector<Posicion>(matrix[0].size()));
-    for(int i=0; i<matrix.size(); i++) {
-        for(int j=0; j<matrix[0].size(); j++) {
-            datosPosiciones[i][j].minDist = INT_MAX - 1;
-            datosPosiciones[i][j].optDist = -1;
-            datosPosiciones[i][j].visitado = 0;
-            datosPosiciones[i][j].factible = true;
-        }
-    }
-
-    
-
-    datosPosiciones[0][0].visitado = 1;
-
-    maze_bb(matrix, 0, 0, 1, datosPosiciones);
     auto end = clock();
 
     double time = 1000.0 * (end-start)/CLOCKS_PER_SEC;
