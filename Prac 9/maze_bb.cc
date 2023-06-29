@@ -247,7 +247,7 @@ vector<Nodo> expande(Nodo nodo, vector<vector<int>> maze) {
     int dCol[] = {0, 1, 1, 1, 0, -1, -1, -1};
 
     for(int i=0; i<8; i++) {
-        if(!(nodo.row + dRow[i] < 0 || nodo.row + dRow[i] >= maze.size() || nodo.col + dCol[i] < 0 || nodo.col + dCol[i] >= maze[0].size())) {
+        if(!(nodo.row + dRow[i] < 0 || nodo.row + dRow[i] >= maze.size() || nodo.col + dCol[i] < 0 || nodo.col + dCol[i] >= maze[0].size()) && maze[nodo.row + dRow[i]][nodo.col + dCol[i]] == 1) {
             vector<int> newMoves = nodo.moves;
             newMoves.push_back(i+1);
             Nodo ex = obtenerNodo(maze, nodo.row + dRow[i], nodo.col + dCol[i], nodo.dist + 1, newMoves);
@@ -334,7 +334,7 @@ int maze_bb(vector<vector<int>> maze, vector<vector<bool>> &visitado) {
 }
 
 void print_result(vector<vector<int>> matrix, double time, int argc, char* argv[], int mejor) {
-    if(mejor > matrix.size() * matrix[0].size()) {
+    if(mejor > matrix.size() * matrix[0].size()) { 
         cout << 0 << endl;
     } else {
         cout << mejor << endl;
