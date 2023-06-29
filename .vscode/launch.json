@@ -7,7 +7,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Prac 9/maze_bb",
-            "args": ["-f", "${workspaceFolder}/Prac 9/file.txt"],
+            "args": ["-p", "-f", "${workspaceFolder}/Prac 9/file.txt"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
