@@ -38,7 +38,7 @@ struct Nodo {
 bool checkParams(int argc, char* argv[]) {
     bool f = false;
     string filename = "";
-
+ 
     for (int i = 1; i < argc; i++) {
         if(strcmp(argv[i], "-f") == 0) {
             if(i < argc - 1) {
@@ -203,7 +203,7 @@ int cotaPesimista(vector<vector<int>> maze, int row, int col) {
             }
             else if(maze[row+1][col] == 1){
                 dist++;
-                row++;
+                row++; 
             }
             else {
                 dist = INT_MAX -1;
