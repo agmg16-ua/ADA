@@ -170,7 +170,7 @@ void print_matrix(vector<vector<int>> matrix) {
 
 int cotaOptimista(int row, int col, int m, int n) {
 
-    return sqrt( pow(m - row, 2) + pow(n - col, 2));
+    return max(m - row, n - col) - 1;
 
 }
 
@@ -206,11 +206,12 @@ int cotaPesimista(vector<vector<int>> maze, int row, int col) {
                 row++; 
             }
             else {
-                dist = INT_MAX -1;
+                dist = INT_MAX - (maze.size() * maze[0].size());
                 continuar = false;
             }
         }
     }
+
     return dist;
 
 }
@@ -234,7 +235,7 @@ bool esHoja(Nodo nodo, vector<vector<int>> maze) {
 }
 
 bool esMejor(Nodo nodo, int mejorActual) {
-    if(nodo.dist < mejorActual) {
+    if(nodo.dist <= mejorActual) {
         return true;
     }
 
@@ -246,6 +247,7 @@ vector<Nodo> expande(Nodo nodo, vector<vector<int>> maze) {
     int dRow[] = {-1, -1, 0, 1, 1, 1, 0, -1};
     int dCol[] = {0, 1, 1, 1, 0, -1, -1, -1};
 
+    
     for(int i=0; i<8; i++) {
         if(!(nodo.row + dRow[i] < 0 || nodo.row + dRow[i] >= maze.size() || nodo.col + dCol[i] < 0 || nodo.col + dCol[i] >= maze[0].size()) && maze[nodo.row + dRow[i]][nodo.col + dCol[i]] == 1) {
             vector<int> newMoves = nodo.moves;
@@ -283,7 +285,7 @@ bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<bool>> visita
 }
 
 bool esPrometedor(Nodo nodo, int mejorActual) {
-    if(nodo.opt > mejorActual) {
+    /*if(nodo.opt > mejorActual) {
         return false;
     }
 
@@ -292,12 +294,14 @@ bool esPrometedor(Nodo nodo, int mejorActual) {
     }
 
 
-    return true;
+    return true;*/
+
+    return nodo.opt <= mejorActual;
 }
 
 struct esPeor {
     bool operator()(const Nodo &n1, const Nodo &n2) {
-        return n1.opt > n2.opt;
+        return n1.dist > n2.dist;
     }
 };
 
@@ -324,8 +328,16 @@ int maze_bb(vector<vector<int>> maze, vector<vector<bool>> &visitado) {
         visitado[actual.row][actual.col] = true;
 
         for(Nodo nodo : expande(actual, maze)) {
-            if(esFactible(nodo, maze, visitado) && esPrometedor(nodo, mejorActual)) {
-                pq.push(nodo);
+            //visitado[nodo.row][nodo.col] = true;
+            if(esFactible(nodo, maze, visitado)) {
+                if(nodo.dist + nodo.pes < mejorActual) {
+                    mejorActual = nodo.dist + nodo.pes;
+                }
+
+                if(esPrometedor(nodo, mejorActual)) {
+                    pq.push(nodo);
+                }
+                
             }
         }
     }
@@ -372,7 +384,7 @@ int main(int argc, char* argv[]) {
 
     vector<vector<int>> matrix = get_data_file(argv[file_position]);
 
-    vector<vector<bool>> visitado(matrix.size(), vector<bool>(matrix[0].size()));
+    vector<vector<bool>> visitado(matrix.size(), vector<bool>(matrix[0].size(), false));
     
     int mejor = maze_bb(matrix, visitado);
 
