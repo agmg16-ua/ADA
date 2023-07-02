@@ -174,45 +174,65 @@ int cotaOptimista(int row, int col, int m, int n) {
 
 }
 
-int cotaPesimista(vector<vector<int>> maze, int row, int col) {
-    int dist = 0;
-    bool continuar = true;
+int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
+    int longitud = 0;
+    bool seguir = true;
+    int filas = matrix.size();
+    int columnas = matrix[0].size();
 
-    while(continuar) {
-        if(row == maze.size()-1 && col == maze[0].size()-1) {
-            dist++;
-            continuar = false;
+    if(matrix[row][col] == 0) {
+        return longitud;
+    }
+
+    while(seguir) {
+        //Condición especial última posicion
+        if(row == filas-1 && col == columnas-1) {
+            matrix[row][col] = -1;
+            longitud++;
+            break;
         }
-        else if(row == maze.size()-1) {
-            dist++;
-            col++;
-        }
-        else if(col == maze[0].size()-1) {
-            dist++;
+
+        //Condicion especial ultima columna
+        if(col == columnas - 1) {
+            if(matrix[row+1][col] == 0){
+                matrix[row][col] = -1;
+                return INT_MAX - (filas * columnas);
+            }
+
+            matrix[row][col] = -1;
             row++;
-        }
-        else {
-            if(maze[row+1][col+1] == 1) {
-                dist++;
+            longitud++;
+        } else if(row == filas - 1) {
+            if(matrix[row][col+1] == 0) {
+                matrix[row][col] = -1;
+                return INT_MAX - (filas * columnas);
+            }
+
+            matrix[row][col] = -1;
+            col++;
+            longitud++;
+        } else {
+            if(matrix[row+1][col+1] == 1) {
+                matrix[row][col] = -1;
                 row++;
                 col++;
-            }
-            else if(maze[row][col+1] == 1) {
-                dist++;
+                longitud++;
+            } else if(matrix[row+1][col] == 1) {
+                matrix[row][col] = -1;
+                row++;
+                longitud++;
+            } else if(matrix[row][col+1] == 1) {
+                matrix[row][col] = -1;
                 col++;
-            }
-            else if(maze[row+1][col] == 1){
-                dist++;
-                row++; 
-            }
-            else {
-                dist = INT_MAX - (maze.size() * maze[0].size());
-                continuar = false;
+                longitud++;
+            } else {
+                matrix[row][col] = -1;
+                return INT_MAX - (filas * columnas);
             }
         }
     }
 
-    return dist;
+    return longitud;
 
 }
 
@@ -220,8 +240,8 @@ Nodo obtenerNodo(vector<vector<int>> maze, int row, int col, int dist, vector<in
     Nodo nodo;
     nodo.row = row;
     nodo.col = col;
-    nodo.opt = cotaOptimista(row, col, maze.size()-1, maze[0].size()-1);
-    nodo.pes = cotaPesimista(maze, row, col);
+    nodo.opt = -1;
+    nodo.pes = -1;
     nodo.dist = dist;
     nodo.moves = moves;
     return nodo;
@@ -249,35 +269,32 @@ vector<Nodo> expande(Nodo nodo, vector<vector<int>> maze) {
 
     
     for(int i=0; i<8; i++) {
-        if(!(nodo.row + dRow[i] < 0 || nodo.row + dRow[i] >= maze.size() || nodo.col + dCol[i] < 0 || nodo.col + dCol[i] >= maze[0].size()) && maze[nodo.row + dRow[i]][nodo.col + dCol[i]] == 1) {
-            vector<int> newMoves = nodo.moves;
-            newMoves.push_back(i+1);
-            Nodo ex = obtenerNodo(maze, nodo.row + dRow[i], nodo.col + dCol[i], nodo.dist + 1, newMoves);
-            nodos.push_back(ex);
-        }
-
+        vector<int> newMoves = nodo.moves;
+        newMoves.push_back(i+1);
+        Nodo ex = obtenerNodo(maze, nodo.row + dRow[i], nodo.col + dCol[i], nodo.dist + 1, newMoves);
+        nodos.push_back(ex);
     }
 
     return nodos;
 }
 
 bool dentroMaze(Nodo nodo, vector<vector<int>> maze) {
-    if(nodo.row >= 0 && nodo.row <= maze.size()-1 && nodo.col >= 0 && nodo.col <= maze[0].size()) {
+    if(nodo.row >= 0 && nodo.row <= maze.size()-1 && nodo.col >= 0 && nodo.col <= maze[0].size()-1) {
         return true;
     }
     return false;
 }
 
 bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<bool>> visitado) {
+    if(!dentroMaze(nodo, maze)) {
+        return false;
+    }
+    
     if(maze[nodo.row][nodo.col] == 0) {
         return false;
     }
 
     if(visitado[nodo.row][nodo.col] == true) {
-        return false;
-    }
-
-    if(!dentroMaze(nodo, maze)) {
         return false;
     }
 
@@ -301,13 +318,15 @@ bool esPrometedor(Nodo nodo, int mejorActual) {
 
 struct esPeor {
     bool operator()(const Nodo &n1, const Nodo &n2) {
-        return n1.dist > n2.dist;
+        return n1.opt > n2.opt;
     }
 };
 
 int maze_bb(vector<vector<int>> maze, vector<vector<bool>> &visitado) {
     priority_queue<Nodo, vector<Nodo>, esPeor> pq;
     Nodo inicial = obtenerNodo(maze, 0, 0, 1, {});
+    inicial.pes = cotaPesimista(maze, 0, 0);
+    inicial.opt = cotaOptimista(0, 0, maze.size(), maze[0].size());
     int mejorActual = inicial.pes;
     pq.push(inicial);
 
@@ -328,8 +347,13 @@ int maze_bb(vector<vector<int>> maze, vector<vector<bool>> &visitado) {
         visitado[actual.row][actual.col] = true;
 
         for(Nodo nodo : expande(actual, maze)) {
-            //visitado[nodo.row][nodo.col] = true;
+            
             if(esFactible(nodo, maze, visitado)) {
+                visitado[nodo.row][nodo.col] = true;
+
+                nodo.pes = cotaPesimista(maze, nodo.row, nodo.col);
+                nodo.opt = cotaOptimista(nodo.row, nodo.col, maze.size(), maze[0].size());
+
                 if(nodo.dist + nodo.pes < mejorActual) {
                     mejorActual = nodo.dist + nodo.pes;
                 }
