@@ -345,7 +345,7 @@ int maze_bb(vector<vector<int>> maze, vector<vector<bool>> &visitado) {
         }
 
         visitado[actual.row][actual.col] = true;
-
+ 
         for(Nodo nodo : expande(actual, maze)) {
             
             if(esFactible(nodo, maze, visitado)) {
