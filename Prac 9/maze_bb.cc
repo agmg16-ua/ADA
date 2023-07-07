@@ -168,13 +168,21 @@ void print_matrix(vector<vector<int>> matrix) {
 
 //------------------------------------------------------------------------------
 
+struct esPeor {
+    bool operator()(const Nodo &n1, const Nodo &n2) {
+        return n1.opt + n1.dist > n2.opt + n2.dist;
+    }
+};
+
+//Obtencion de la cota optimista
 int cotaOptimista(int row, int col, int m, int n) {
 
     return max(m - row, n - col) - 1;
 
 }
 
-int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
+//Obtencion de la cota pesimista
+int cotaPesimista(vector<vector<int>> &matrix, int row, int col) {
     int longitud = 0;
     bool seguir = true;
     int filas = matrix.size();
@@ -187,7 +195,6 @@ int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
     while(seguir) {
         //Condición especial última posicion
         if(row == filas-1 && col == columnas-1) {
-            matrix[row][col] = -1;
             longitud++;
             break;
         }
@@ -195,16 +202,13 @@ int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
         //Condicion especial ultima columna
         if(col == columnas - 1) {
             if(matrix[row+1][col] == 0){
-                matrix[row][col] = -1;
                 return INT_MAX - (filas * columnas);
             }
 
-            matrix[row][col] = -1;
             row++;
             longitud++;
         } else if(row == filas - 1) {
             if(matrix[row][col+1] == 0) {
-                matrix[row][col] = -1;
                 return INT_MAX - (filas * columnas);
             }
 
@@ -213,20 +217,16 @@ int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
             longitud++;
         } else {
             if(matrix[row+1][col+1] == 1) {
-                matrix[row][col] = -1;
                 row++;
                 col++;
                 longitud++;
             } else if(matrix[row+1][col] == 1) {
-                matrix[row][col] = -1;
                 row++;
                 longitud++;
             } else if(matrix[row][col+1] == 1) {
-                matrix[row][col] = -1;
                 col++;
                 longitud++;
             } else {
-                matrix[row][col] = -1;
                 return INT_MAX - (filas * columnas);
             }
         }
@@ -236,6 +236,7 @@ int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
 
 }
 
+//Metodo para crear un nuevo nodo, en cualquier caso
 Nodo obtenerNodo(int row, int col, int dist, vector<int> moves) {
     Nodo nodo;
     nodo.row = row;
@@ -247,6 +248,7 @@ Nodo obtenerNodo(int row, int col, int dist, vector<int> moves) {
     return nodo;
 }
 
+//Comprobar si un nodo es hoja
 bool esHoja(Nodo nodo, vector<vector<int>> &maze) {
     if(nodo.row == maze.size()-1 && nodo.col == maze[0].size()-1) {
         return true;
@@ -254,6 +256,7 @@ bool esHoja(Nodo nodo, vector<vector<int>> &maze) {
     return false;
 }
 
+//Comprobar si el nodo actual tiene mejor solución que uno ya calculado
 bool esMejor(Nodo nodo, int mejorActual) {
     if(nodo.dist <= mejorActual) {
         return true;
@@ -261,7 +264,8 @@ bool esMejor(Nodo nodo, int mejorActual) {
 
     return false;
 }
-  
+
+//Expandir todos los nodos a partir de uno
 vector<Nodo> expande(Nodo nodo) {
     vector<Nodo> nodos;
     int dRow[] = {-1, -1, 0, 1, 1, 1, 0, -1};
@@ -278,13 +282,16 @@ vector<Nodo> expande(Nodo nodo) {
     return nodos;
 }
 
+//Comprobar si un nodo está dentro del laberinto
 bool dentroMaze(Nodo nodo, vector<vector<int>> &maze) {
-    if(nodo.row >= 0 && nodo.row <= maze.size()-1 && nodo.col >= 0 && nodo.col <= maze[0].size()-1) {
+    if(nodo.row >= 0 && nodo.row <= maze.size()-1 && 
+        nodo.col >= 0 && nodo.col <= maze[0].size()-1) {
         return true;
     }
     return false;
 }
 
+//Comprobación de si un nodo es factible
 bool esFactible(Nodo nodo, vector<vector<int>> &maze, vector<vector<int>> &distancias) {
     if(!dentroMaze(nodo, maze)) {
         return false;
@@ -300,17 +307,12 @@ bool esFactible(Nodo nodo, vector<vector<int>> &maze, vector<vector<int>> &dista
     return true;
 }
 
+//Comprobación de si un nodo es prometedor, para añadirlo a la pq
 bool esPrometedor(Nodo nodo, int mejorActual) {
     return nodo.opt + nodo.dist <= mejorActual;
 }
 
-struct esPeor {
-    bool operator()(const Nodo &n1, const Nodo &n2) {
-        //return n1.opt > n2.opt;
-        return n1.opt + n1.dist > n2.opt + n2.dist;
-    }
-};
-
+//Método principal
 int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
     priority_queue<Nodo, vector<Nodo>, esPeor> pq;
     Nodo inicial = obtenerNodo(0, 0, 1, {});
@@ -325,9 +327,10 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
         pq.pop();
 
         if(esHoja(actual, maze)) {
-            estadisticas.hoja++;
+            estadisticas.hoja++; //CONTADOR
 
             if(esMejor(actual, mejorActual)) {
+                estadisticas.mejor_solucion_act_hoja++; //CONTADOR
                 mejorActual = actual.dist;
                 minMoves = actual.moves;
             }
@@ -335,7 +338,7 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
         }
 
         for(Nodo nodo : expande(actual)) {
-            
+            estadisticas.visita++; //CONTADOR
             if(esFactible(nodo, maze, distancias)) {
                 distancias[nodo.row][nodo.col] = nodo.dist;
 
@@ -343,13 +346,21 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
                 nodo.opt = cotaOptimista(nodo.row, nodo.col, maze.size(), maze[0].size());
 
                 if(nodo.dist + nodo.pes < mejorActual) {
+                    estadisticas.mejor_solucion_act_pesimista++; //CONTADOR
                     mejorActual = nodo.dist + nodo.pes;
                 }
 
                 if(esPrometedor(nodo, mejorActual)) {
+                    estadisticas.explorado++; //CONTADOR
                     pq.push(nodo);
                 }
+                else {
+                    estadisticas.no_prometedor++; //CONTADOR
+                }
                 
+            }
+            else {
+                estadisticas.no_factible++; //CONTADOR
             }
         }
     }
