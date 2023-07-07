@@ -236,7 +236,7 @@ int cotaPesimista(vector<vector<int>> matrix, int row, int col) {
 
 }
 
-Nodo obtenerNodo(vector<vector<int>> maze, int row, int col, int dist, vector<int> moves) {
+Nodo obtenerNodo(int row, int col, int dist, vector<int> moves) {
     Nodo nodo;
     nodo.row = row;
     nodo.col = col;
@@ -247,7 +247,7 @@ Nodo obtenerNodo(vector<vector<int>> maze, int row, int col, int dist, vector<in
     return nodo;
 }
 
-bool esHoja(Nodo nodo, vector<vector<int>> maze) {
+bool esHoja(Nodo nodo, vector<vector<int>> &maze) {
     if(nodo.row == maze.size()-1 && nodo.col == maze[0].size()-1) {
         return true;
     }
@@ -262,7 +262,7 @@ bool esMejor(Nodo nodo, int mejorActual) {
     return false;
 }
   
-vector<Nodo> expande(Nodo nodo, vector<vector<int>> maze) {
+vector<Nodo> expande(Nodo nodo) {
     vector<Nodo> nodos;
     int dRow[] = {-1, -1, 0, 1, 1, 1, 0, -1};
     int dCol[] = {0, 1, 1, 1, 0, -1, -1, -1};
@@ -271,21 +271,21 @@ vector<Nodo> expande(Nodo nodo, vector<vector<int>> maze) {
     for(int i=0; i<8; i++) {
         vector<int> newMoves = nodo.moves;
         newMoves.push_back(i+1);
-        Nodo ex = obtenerNodo(maze, nodo.row + dRow[i], nodo.col + dCol[i], nodo.dist + 1, newMoves);
+        Nodo ex = obtenerNodo(nodo.row + dRow[i], nodo.col + dCol[i], nodo.dist + 1, newMoves);
         nodos.push_back(ex);
     }
 
     return nodos;
 }
 
-bool dentroMaze(Nodo nodo, vector<vector<int>> maze) {
+bool dentroMaze(Nodo nodo, vector<vector<int>> &maze) {
     if(nodo.row >= 0 && nodo.row <= maze.size()-1 && nodo.col >= 0 && nodo.col <= maze[0].size()-1) {
         return true;
     }
     return false;
 }
 
-bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<int>> &distancias) {
+bool esFactible(Nodo nodo, vector<vector<int>> &maze, vector<vector<int>> &distancias) {
     if(!dentroMaze(nodo, maze)) {
         return false;
     }
@@ -313,7 +313,7 @@ struct esPeor {
 
 int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
     priority_queue<Nodo, vector<Nodo>, esPeor> pq;
-    Nodo inicial = obtenerNodo(maze, 0, 0, 1, {});
+    Nodo inicial = obtenerNodo(0, 0, 1, {});
     inicial.pes = cotaPesimista(maze, 0, 0);
     inicial.opt = cotaOptimista(0, 0, maze.size(), maze[0].size());
     int mejorActual = inicial.pes;
@@ -334,7 +334,7 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
             continue;
         }
 
-        for(Nodo nodo : expande(actual, maze)) {
+        for(Nodo nodo : expande(actual)) {
             
             if(esFactible(nodo, maze, distancias)) {
                 distancias[nodo.row][nodo.col] = nodo.dist;
