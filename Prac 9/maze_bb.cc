@@ -285,7 +285,7 @@ bool dentroMaze(Nodo nodo, vector<vector<int>> maze) {
     return false;
 }
 
-bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<int>> distancias) {
+bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<int>> &distancias) {
     if(!dentroMaze(nodo, maze)) {
         return false;
     }
@@ -301,12 +301,13 @@ bool esFactible(Nodo nodo, vector<vector<int>> maze, vector<vector<int>> distanc
 }
 
 bool esPrometedor(Nodo nodo, int mejorActual) {
-    return nodo.opt <= mejorActual;
+    return nodo.opt + nodo.dist <= mejorActual;
 }
 
 struct esPeor {
     bool operator()(const Nodo &n1, const Nodo &n2) {
-        return n1.opt > n2.opt;
+        //return n1.opt > n2.opt;
+        return n1.opt + n1.dist > n2.opt + n2.dist;
     }
 };
 
@@ -336,7 +337,6 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
         for(Nodo nodo : expande(actual, maze)) {
             
             if(esFactible(nodo, maze, distancias)) {
-
                 distancias[nodo.row][nodo.col] = nodo.dist;
 
                 nodo.pes = cotaPesimista(maze, nodo.row, nodo.col);
@@ -347,7 +347,6 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
                 }
 
                 if(esPrometedor(nodo, mejorActual)) {
-                    //cout << nodo.row << "," << nodo.col << endl;
                     pq.push(nodo);
                 }
                 
@@ -403,7 +402,7 @@ int main(int argc, char* argv[]) {
 
     auto end = clock();
 
-    double time = 1000.0 * (end-start)/CLOCKS_PER_SEC;
+    double time = 1.0 * (end-start)/CLOCKS_PER_SEC;
 
     print_result(matrix, time, argc, argv, mejor);
 
