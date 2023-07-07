@@ -413,7 +413,7 @@ int main(int argc, char* argv[]) {
 
     auto end = clock();
 
-    double time = 1.0 * (end-start)/CLOCKS_PER_SEC;
+    double time = 1000.0 * (end-start)/CLOCKS_PER_SEC;
 
     print_result(matrix, time, argc, argv, mejor);
 
