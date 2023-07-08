@@ -302,6 +302,7 @@ bool esFactible(Nodo nodo, vector<vector<int>> &maze, vector<vector<int>> &dista
     }
 
     if(distancias[nodo.row][nodo.col] <= nodo.dist) {
+        estadisticas.prometedor_rechazado++; //CONTADOR
         return false;
     }
     return true;
