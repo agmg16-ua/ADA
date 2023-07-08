@@ -318,7 +318,7 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
     Nodo inicial = obtenerNodo(0, 0, 1, {});
     inicial.pes = cotaPesimista(maze, 0, 0);
     inicial.opt = cotaOptimista(0, 0, maze.size(), maze[0].size());
-    int mejorActual = inicial.pes;
+    int mejorActual = inicial.pes + 1;
     pq.push(inicial);
     distancias[0][0] = 1;
 
