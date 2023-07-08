@@ -302,6 +302,7 @@ bool esFactible(Nodo nodo, vector<vector<int>> &maze, vector<vector<int>> &dista
     }
 
     if(distancias[nodo.row][nodo.col] <= nodo.dist) {
+        estadisticas.prometedor_rechazado;
         return false;
     }
     return true;
@@ -318,7 +319,7 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
     Nodo inicial = obtenerNodo(0, 0, 1, {});
     inicial.pes = cotaPesimista(maze, 0, 0);
     inicial.opt = cotaOptimista(0, 0, maze.size(), maze[0].size());
-    int mejorActual = inicial.pes + 1;
+    int mejorActual = inicial.pes;
     pq.push(inicial);
     distancias[0][0] = 1;
 
@@ -334,12 +335,6 @@ int maze_bb(vector<vector<int>> maze, vector<vector<int>> &distancias) {
                 mejorActual = actual.dist;
                 minMoves = actual.moves;
             }
-            continue;
-        }
-
-        //Si era prometedor, pero ya no lo es, se descarta el nodo y sus expansiones
-        if(!esPrometedor(actual, mejorActual)) {
-            estadisticas.prometedor_rechazado++; //CONTADOR
             continue;
         }
 
